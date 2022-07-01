@@ -45,23 +45,11 @@ def plot_rank_vs_song_popularity(df, artists=[]):
     return st.plotly_chart(fig, config=config, use_container_width=True)
 
 
-def plot_rank_vs_artist_popularity(df, artists=[]):
-    """Plot the rank vs popularity of the songs in the dataframe
+if __name__ == "__main__":
+    data = read_data()
+    st.title("Rolling Stone Top 500 Explorer")
+    artists = st.multiselect(
+        "Select artists to highlight", data["artist_name"].unique()
+    )
 
-    Parameters
-    ----------
-    df : _type_
-        _description_
-    artists : _type_
-        _description_
-    """
-
-    return
-
-
-data = read_data()
-st.title("Rolling Stone Top 500 Explorer")
-artists = st.multiselect("Select artists to highlight", data["artist_name"].unique())
-
-plot_rank_vs_song_popularity(data, artists)
-plot_rank_vs_artist_popularity(data, artists)
+    plot_rank_vs_song_popularity(data, artists)
