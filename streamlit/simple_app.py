@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+import another_plot as ap
 
 @st.cache(allow_output_mutation=True)
 def read_data():
@@ -53,3 +54,4 @@ if __name__ == "__main__":
     )
 
     plot_rank_vs_song_popularity(data, artists)
+    ap.plot_rank_vs_artist_popularity(data,artists)
