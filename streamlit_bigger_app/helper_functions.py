@@ -1,4 +1,5 @@
 import os
+from re import X
 
 import numpy as np
 import pandas as pd
@@ -37,7 +38,10 @@ column_type_mapping = {
 base_fields = [
     i
     for i in column_type_mapping.keys()
-    if column_type_mapping[i] in ["numeric", "text"]
+    if column_type_mapping[i] == "numeric"
+    and "track" in i
+    and "duration" not in i
+    and "popularity" not in i
 ]
 
 data_dictionary = """
@@ -87,6 +91,23 @@ def to_string(x):
     return x.astype(str)
 
 
+def generate_hover_label(df, level="track"):
+    if level == "track":
+        return [
+            f"Artist Name: {artist_name} </br> Track Name: {track_name} </br> Track Ranking: {rank} </br> Track Popularity: {popularity}"
+            for artist_name, track_name, rank, popularity in zip(
+                df.artist_name, df.track_name, df["rank"], df.track_popularity
+            )
+        ]
+    else:
+        return [
+            f"Artist Name: {artist_name} </br> Best Ranking: {rank} </br> Artist Popularity: {popularity}"
+            for artist_name, rank, popularity in zip(
+                df.artist_name, df["rank"], df["artist_popularity"]
+            )
+        ]
+
+
 def plot_rank_vs_song_popularity(container, df, artists=[]):
     """Plot the rank vs popularity of the songs in the dataframe
 
@@ -98,26 +119,51 @@ def plot_rank_vs_song_popularity(container, df, artists=[]):
         a list of artists chosen by the select dropdown
     """
 
-    df["artist_indicator"] = np.where(df.artist_name.isin(artists), 1, 0)
-
-    fig = px.scatter(
-        data_frame=df,
-        x="rank",
-        y="track_popularity",
-        color="artist_indicator",
-        hover_name="track_name",
-        title="Track Ranking against Track Popularity",
-        hover_data=["artist_name"],
-        trendline="lowess",
+    df_selected_artist = df.loc[lambda x: x.artist_name.isin(artists)]
+    df_not_selected_artist = df.loc[lambda x: ~x.artist_name.isin(artists)]
+    hovertemplate = "</br>%{text}<extra></extra>"
+    fig = go.Figure(
+        go.Scatter(
+            mode="markers",
+            x=df_not_selected_artist["rank"],
+            y=df_not_selected_artist.artist_popularity,
+            marker_size=8,
+            text=generate_hover_label(df_not_selected_artist, level="track"),
+            hovertemplate=hovertemplate,
+            marker_color="#1f77b4",
+            marker_symbol="circle",
+            marker_line_width=1,
+            opacity=0.7,
+        )
     )
-    fig.update_xaxes(autorange="reversed")
+    fig = fig.add_trace(
+        go.Scatter(
+            mode="markers",
+            x=df_selected_artist["rank"],
+            y=df_selected_artist.artist_popularity,
+            marker_size=15,
+            text=generate_hover_label(df_selected_artist, level="track"),
+            marker_color="lightskyblue",
+            marker_symbol="star",
+            marker_line_width=1.5,
+            opacity=1,
+            showlegend=False,
+        )
+    )
+
+    fig.update_traces(showlegend=False)
     fig.update_coloraxes(showscale=False)
+    fig.update_xaxes(autorange="reversed")
     fig = fig.update_layout(
+        title="Track Ranking against Track Popularity",
         legend=None,
         plot_bgcolor="white",
         margin=dict(t=50, l=10, b=10, r=10),
         xaxis_title="Track Ranking",
         yaxis_title="Track Current Popularity",
+        hoverlabel=dict(
+            bgcolor="white", font_size=16, font_family="Rockwell", namelength=-1
+        ),
     )
 
     config = {"displayModeBar": False}
@@ -141,26 +187,52 @@ def plot_rank_vs_artist_popularity(container, df, artists=[]):
         .reset_index()
         .sort_values(by="artist_popularity", ascending=False)
     )
+    df_selected_artist = df_artist.loc[lambda x: x.artist_name.isin(artists)]
+    df_not_selected_artist = df_artist.loc[lambda x: ~x.artist_name.isin(artists)]
 
-    df_artist["artist_indicator"] = np.where(df_artist.artist_name.isin(artists), 1, 0)
-
-    fig = px.scatter(
-        data_frame=df_artist,
-        x="rank",
-        y="artist_popularity",
-        color="artist_indicator",
-        hover_name="artist_name",
-        title="Artist's Best Track Ranking against Artist Popularity",
-        hover_data=["artist_name"],
-        trendline="lowess",
+    hovertemplate = "</br>%{text}<extra></extra>"
+    fig = go.Figure(
+        go.Scatter(
+            mode="markers",
+            x=df_not_selected_artist["rank"],
+            y=df_not_selected_artist.artist_popularity,
+            marker_size=8,
+            text=generate_hover_label(df_not_selected_artist, level="artist"),
+            hovertemplate=hovertemplate,
+            marker_color="#1f77b4",
+            marker_symbol="circle",
+            marker_line_width=1,
+            opacity=0.7,
+        )
     )
+    fig = fig.add_trace(
+        go.Scatter(
+            mode="markers",
+            x=df_selected_artist["rank"],
+            y=df_selected_artist.artist_popularity,
+            marker_size=15,
+            text=generate_hover_label(df_selected_artist, level="artist"),
+            hovertemplate=hovertemplate,
+            marker_color="lightskyblue",
+            marker_symbol="star",
+            marker_line_width=1.5,
+            opacity=1,
+            showlegend=False,
+        )
+    )
+
+    fig.update_traces(showlegend=False)
     fig.update_coloraxes(showscale=False)
     fig.update_xaxes(autorange="reversed")
     fig.update_layout(
+        title="Artist's Best Track Ranking against Artist Popularity",
         plot_bgcolor="white",
         margin=dict(t=50, l=10, b=10, r=10),
         xaxis_title="Artist Best Ranking",
         yaxis_title="Artist Current Popularity",
+        hoverlabel=dict(
+            bgcolor="white", font_size=16, font_family="Rockwell", namelength=-1
+        ),
     )
     fig.layout.update(showlegend=True)
 

@@ -76,7 +76,10 @@ def _main():
     hf.plot_rank_vs_song_popularity(scatter_1, df, artists_to_highlight)
     hf.plot_rank_vs_artist_popularity(scatter_2, df, artists_to_highlight)
 
-    table.write(df)
+    if artists_to_highlight:
+        table.write(df.loc[lambda x: x["artist_name"].isin(artists_to_highlight)])
+    else:
+        table.write(df)
 
     with st.sidebar.form(key="my_form"):
         st.write("Select Dimensionality Reduction and Clustering Parameters")
