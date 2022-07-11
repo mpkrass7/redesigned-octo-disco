@@ -126,7 +126,7 @@ def plot_rank_vs_song_popularity(container, df, artists=[]):
         go.Scatter(
             mode="markers",
             x=df_not_selected_artist["rank"],
-            y=df_not_selected_artist.artist_popularity,
+            y=df_not_selected_artist.track_popularity,
             marker_size=8,
             text=generate_hover_label(df_not_selected_artist, level="track"),
             hovertemplate=hovertemplate,
