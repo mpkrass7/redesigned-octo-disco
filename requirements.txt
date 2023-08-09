@@ -27,7 +27,7 @@ pandas==2.0.3
 patsy==0.5.3
 Pillow==10.0.0
 plotly==5.6.0
-protobuf==3.20.3.post2+dr
+protobuf==3.20.1
 pyarrow==12.0.1
 pycparser==2.21
 pydeck==0.8.1b0
