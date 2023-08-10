@@ -1,5 +1,4 @@
 import os
-from re import X
 
 import numpy as np
 import pandas as pd
@@ -12,7 +11,6 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder, FunctionTransformer
 from sklearn.pipeline import Pipeline
-import streamlit as st
 import umap
 
 column_type_mapping = {

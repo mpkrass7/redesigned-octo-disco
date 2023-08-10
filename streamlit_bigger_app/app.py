@@ -13,7 +13,6 @@ st.set_page_config(
 
 hide_streamlit_style = """
     <style>
-    #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     </style>
     """
@@ -107,17 +106,22 @@ def _main():
         print("Running Pipeline")
         dimensions = int(plot_3d[0])
         cluster_box.info(f"Projecting results onto {dimensions}D plane..")
-        umap_embedding, clusters = hf.run_pipeline(
-            df, pipe, {}, n_components=dimensions, seed=seed
-        )
-        hf.plot_umap_results(
-            cluster_box,
-            df,
-            umap_embedding,
-            clusters,
-            artists=artists_to_highlight,
-            is_3d=dimensions == 3,
-        )
+        try:
+            umap_embedding, clusters = hf.run_pipeline(
+                df, pipe, {}, n_components=dimensions, seed=seed
+            )
+            hf.plot_umap_results(
+                cluster_box,
+                df,
+                umap_embedding,
+                clusters,
+                artists=artists_to_highlight,
+                is_3d=dimensions == 3,
+            )
+        except TypeError:
+            cluster_box.error(
+                "Error running pipeline. Change the seed in advanced options and try again."
+            )
 
 
 if __name__ == "__main__":
