@@ -410,10 +410,11 @@ def plot_umap_results(container, df, umap_embedding, clusters, artists=[], is_3d
 
     fig = fig.update_layout(
         title_font_size=20,
+        title=None,
         plot_bgcolor="#ffffff",
         hoverlabel=dict(
             bgcolor="white", font_size=16, font_family="Rockwell", namelength=-1
         ),
         margin=dict(l=20, r=20, t=30, b=20),
-    )
+    ).update_yaxes(showgrid=False)
     return container.plotly_chart(fig, use_container_width=True)
