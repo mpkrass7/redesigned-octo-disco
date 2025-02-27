@@ -39,12 +39,12 @@ def layout_application():
     )
 
 
-@st.cache(allow_output_mutation=True)
+@st.cache_data()
 def read_data():
 
     df = pd.read_csv("data/spotify_music_output.csv").fillna("")
     artists = sorted(df["artist_name"].unique())
-    return df, artists
+    return df.copy(), artists
 
 
 def _main():
@@ -59,7 +59,7 @@ def _main():
         table,
     ) = layout_application()
 
-    params = st.experimental_get_query_params()
+    params = st.query_params
     if "debug" not in params:
         st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
@@ -105,7 +105,7 @@ def _main():
         pipe = hf.build_pipeline(features, use_svd=use_svd, seed=seed)
         print("Running Pipeline")
         dimensions = int(plot_3d[0])
-        cluster_box.info(f"Projecting results onto {dimensions}D plane..")
+        cluster_box.info(f"Projecting songs onto a {dimensions}-dimensional plane..")
         try:
             umap_embedding, clusters = hf.run_pipeline(
                 df, pipe, {}, n_components=dimensions, seed=seed

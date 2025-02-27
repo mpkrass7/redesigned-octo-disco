@@ -71,6 +71,7 @@ Pressing the run button allows you to project various features of the songs onto
 
 """
 
+
 # Modified TruncatedSVD that doesn't fail if n_components > ncols
 class MyTruncatedSVD(TruncatedSVD):
     def fit_transform(self, X, y=None):
@@ -299,7 +300,6 @@ def build_pipeline(features, use_svd=False, seed=42):
     return pipeline
 
 
-# @st.cache(allow_output_mutation=True)
 def run_pipeline(df, pipeline, parameters_dict, n_components=2, seed=42):
     np.random.seed(seed)
     umap_embedding = (
