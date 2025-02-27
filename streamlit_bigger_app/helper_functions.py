@@ -357,7 +357,6 @@ def plot_umap_results(container, df, umap_embedding, clusters, artists=[], is_3d
                     marker=dict(
                         size=10,
                         color=clusters,  # set color to an array/list of desired values
-                        # colorscale='Viridis',   # choose a colorscale
                         opacity=0.75,
                     ),
                 )
@@ -407,10 +406,13 @@ def plot_umap_results(container, df, umap_embedding, clusters, artists=[], is_3d
                 marker=dict(size=15),
             )
         )
-
+    dimensions = "3" if is_3d else "2"
+    title = (
+        f"UMAP Projection of Rolling Stone Top 500 Tracks in {dimensions} Dimensions"
+    )
     fig = fig.update_layout(
         title_font_size=20,
-        title=None,
+        title=title,
         plot_bgcolor="#ffffff",
         hoverlabel=dict(
             bgcolor="white", font_size=16, font_family="Rockwell", namelength=-1
